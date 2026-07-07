@@ -1,0 +1,42 @@
+name: Auto Update PV Recycle Data
+
+on:
+  schedule:
+    # 每小时整点执行（UTC时间），北京时间 = UTC+8
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    # 允许手动触发
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run auto update
+        run: python auto_update.py --once
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add current_report.json price_history.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto update: $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi

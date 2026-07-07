@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报废光伏组件回收价值测算系统</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-light: #e8f0fe;
+            --success: #34a853;
+            --danger: #ea4335;
+            --warning: #fbbc04;
+            --gold: #c9a961;
+            --silver-color: #8a8a8a;
+            --aluminum-color: #a8d5e2;
+            --copper-color: #b87333;
+            --silicon-color: #5f6368;
+            --glass-color: #c4e1f6;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-secondary: #666666;
+            --border: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
+            color: white;
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header h1 .icon {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #ffd54f, #ffb300);
+            border-radius: 6px;
+            text-align: center;
+            line-height: 28px;
+            font-size: 16px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .header .status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+        }
+
+        .header .status .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .header .status .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .tag {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* 实时价格卡片 */
+        .price-card {
+            text-align: center;
+            padding: 16px;
+        }
+
+        .price-card .metal-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .price-card .metal-name {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .price-card .price-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .price-card .price-unit {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .price-card .price-diff {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .price-diff.up { color: var(--danger); }
+        .price-diff.down { color: var(--success); }
+
+        /* 价值总览 */
+        .value-summary {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .value-item {
+            text-align: center;
+        }
+
+        .value-item .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .value-item .amount {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .value-item .amount.red { color: var(--danger); }
+        .value-item .amount.green { color: var(--success); }
+
+        .value-item .sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* 成分分析表 */
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .analysis-table th {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary);
+            font-size: 12px;
+        }
+
+        .analysis-table td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .analysis-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .analysis-table .highlight-row {
+            background: #fff8e1;
+        }
+
+        .analysis-table .value-bar {
+            display: inline-block;
+            height: 16px;
+            border-radius: 3px;
+            min-width: 2px;
+        }
+
+        .pct-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .pct-bar .bar-container {
+            width: 80px;
+            height: 14px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .pct-bar .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* 价值贡献饼图区域 */
+        .contribution-chart {
+            position: relative;
+            min-height: 200px;
+        }
+
+        .pie-svg {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* 组件类型选择 */
+        .type-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .type-btn {
+            padding: 8px 20px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: var(--primary);
+        }
+
+        .type-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .type-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* 银含量详细说明 */
+        .silver-detail {
+            background: #fff3e0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 12px;
+            color: #795548;
+            margin-top: 8px;
+        }
+
+        .silver-detail strong {
+            color: #e65100;
+        }
+
+        /* 批量计算区域 */
+        .batch-section {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .batch-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .batch-input input {
+            width: 120px;
+            padding: 8px 12px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .batch-result {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* 价格历史表格 */
+        .history-section {
+            margin-top: 16px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .history-table th {
+            background: #f5f5f5;
+            padding: 6px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .history-table td {
+            padding: 6px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* 更新时间显示 */
+        .update-time {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 12px;
+        }
+
+        .update-time .countdown {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* 数据源说明 */
+        .source-note {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            padding: 8px;
+            background: #fafafa;
+            border-radius: 6px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                padding: 16px;
+            }
+            .header h1 { font-size: 16px; }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* 模型参数面板 */
+        .params-panel {
+            background: #f8f9ff;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 12px;
+        }
+
+        .param-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .param-row .param-label {
+            color: var(--text-secondary);
+        }
+
+        .param-row .param-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* 对比表格 */
+        .compare-card {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+    <h1><span class="icon">⚡</span> 报废光伏组件回收价值测算系统</h1>
+    <div class="status">
+        <span class="badge">SMM上海有色网联动</span>
+        <span><span class="live-dot"></span> 每1小时自动更新</span>
+        <span class="badge" id="updateStatus">加载中...</span>
+    </div>
+</div>
+
+<div class="container">
+    <!-- 实时金属价格 (金/银/铜/铝/锡) -->
+    <div class="grid-5" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;">
+        <div class="card price-card" id="goldPrice">
+            <div class="metal-icon" style="background: linear-gradient(135deg, #FFD700, #DAA520); color: white;">Au</div>
+            <div class="metal-name">黄金回收价</div>
+            <div class="price-value" id="goldVal">--</div>
+            <div class="price-unit">元/克 · <span id="goldSource">SMM×0.95</span></div>
+            <div class="price-diff" id="goldDiff"></div>
+            <div style="font-size:10px;color:#999;margin-top:2px" id="goldNote">沪金期货×回购折扣</div>
+        </div>
+        <div class="card price-card" id="silverPrice">
+            <div class="metal-icon" style="background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: white;">Ag</div>
+            <div class="metal-name">白银回收价</div>
+            <div class="price-value" id="silverVal">--</div>
+            <div class="price-unit">元/克 · <span id="silverSource">SMM×0.95</span></div>
+            <div class="price-diff" id="silverDiff"></div>
+            <div style="font-size:10px;color:#999;margin-top:2px" id="silverNote">沪银期货÷1000×折扣</div>
+        </div>
+        <div class="card price-card" id="copperPrice">
+            <div class="metal-icon" style="background: linear-gradient(135deg, #b87333, #8B4513); color: white;">Cu</div>
+            <div class="metal-name">废铜回收价</div>
+            <div class="price-value" id="copperVal">--</div>
+            <div class="price-unit">元/kg · <span id="copperSource">SMM×0.80</span></div>
+            <div class="price-diff" id="copperDiff"></div>
+            <div style="font-size:10px;color:#999;margin-top:2px" id="copperNote">沪铜期货÷1000×折扣</div>
+        </div>
+        <div class="card price-card" id="aluminumPrice">
+            <div class="metal-icon" style="background: linear-gradient(135deg, #a8d5e2, #78b4c8); color: white;">Al</div>
+            <div class="metal-name">废铝回收价</div>
+            <div class="price-value" id="aluminumVal">--</div>
+            <div class="price-unit">元/kg · <span id="aluminumSource">SMM×0.75</span></div>
+            <div class="price-diff" id="aluminumDiff"></div>
+            <div style="font-size:10px;color:#999;margin-top:2px" id="aluminumNote">沪铝期货÷1000×折扣</div>
+        </div>
+        <div class="card price-card" id="tinPrice">
+            <div class="metal-icon" style="background: linear-gradient(135deg, #7d7d7d, #4a4a4a); color: white;">Sn</div>
+            <div class="metal-name">废锡回收价</div>
+            <div class="price-value" id="tinVal">--</div>
+            <div class="price-unit">元/kg · <span id="tinSource">SMM×0.85</span></div>
+            <div class="price-diff" id="tinDiff"></div>
+            <div style="font-size:10px;color:#999;margin-top:2px" id="tinNote">沪锡期货÷1000×折扣</div>
+        </div>
+    </div>
+
+    <!-- 组件类型选择 -->
+    <div class="type-selector" id="typeSelector">
+        <button class="type-btn active" data-type="mono_perc" onclick="switchType('mono_perc')">单晶PERC</button>
+        <button class="type-btn" data-type="mono" onclick="switchType('mono')">单晶硅(常规)</button>
+        <button class="type-btn" data-type="poly" onclick="switchType('poly')">多晶硅</button>
+        <button class="type-btn" data-type="thin_film" onclick="switchType('thin_film')">薄膜(CdTe)</button>
+    </div>
+
+    <!-- 价值总览 -->
+    <div class="card">
+        <div class="card-title">💰 单块组件回收价值总览 <span class="tag" id="typeLabel">单晶PERC</span></div>
+        <div class="value-summary">
+            <div class="value-item">
+                <div class="label">可回收材料总值</div>
+                <div class="amount green" id="totalRecoverable">--</div>
+                <div class="sub">元/块</div>
+            </div>
+            <div class="value-item">
+                <div class="label">回收处理成本</div>
+                <div class="amount red" id="processingCost">41</div>
+                <div class="sub">元/块</div>
+            </div>
+            <div class="value-item">
+                <div class="label">净回收价值(报价基准)</div>
+                <div class="amount green" id="netValue">--</div>
+                <div class="sub" id="perWattSub">元/块</div>
+            </div>
+            <div class="value-item">
+                <div class="label">每瓦回收价</div>
+                <div class="amount" id="perWattValue">--</div>
+                <div class="sub">元/W</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成分含量与价值分析表 -->
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">📊 各成分含量与价值明细 <span class="tag">按价值降序排列</span></div>
+            <table class="analysis-table" id="analysisTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>成分</th>
+                        <th>含量</th>
+                        <th>占比</th>
+                        <th>回收率</th>
+                        <th>可回收量</th>
+                        <th>单价</th>
+                        <th>回收价值</th>
+                        <th>价值占比</th>
+                    </tr>
+                </thead>
+                <tbody id="analysisBody"></tbody>
+            </table>
+            <div class="silver-detail" id="silverNote"></div>
+        </div>
+
+        <!-- 价值贡献度分析 -->
+        <div class="card">
+            <div class="card-title">🏆 价值贡献度分析 <span class="tag">铝+银占比最高</span></div>
+            <div class="contribution-chart" id="contributionChart"></div>
+            <div class="source-note" id="contributionNote"></div>
+        </div>
+    </div>
+
+    <!-- 模型参数 + 不同类型对比 -->
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">⚙️ 模型参数 <span class="tag">可自定义调整</span></div>
+            <div class="params-panel">
+                <div class="param-row"><span class="param-label">标准面板重量</span><span class="param-value">20 kg</span></div>
+                <div class="param-row"><span class="param-label">标准面板面积</span><span class="param-value">1.6 m²</span></div>
+                <div class="param-row"><span class="param-label">电池片数量</span><span class="param-value">60片</span></div>
+                <div class="param-row"><span class="param-label">标称功率</span><span class="param-value">540-580 W</span></div>
+                <div class="param-row"><span class="param-label">PERC银耗</span><span class="param-value">7.5 mg/W (120mg/片)</span></div>
+                <div class="param-row"><span class="param-label">多晶银耗</span><span class="param-value">5.5 mg/W (80mg/片)</span></div>
+                <div class="param-row"><span class="param-label">银回收率</span><span class="param-value">90%</span></div>
+                <div class="param-row"><span class="param-label">铝回收率</span><span class="param-value">98%</span></div>
+                <div class="param-row"><span class="param-label">玻璃回收率</span><span class="param-value">95%</span></div>
+                <div class="param-row"><span class="param-label">硅回收率</span><span class="param-value">85%</span></div>
+                <div class="param-row"><span class="param-label">铜回收率</span><span class="param-value">95%</span></div>
+                <div class="param-row"><span class="param-label">处理成本合计</span><span class="param-value" style="color: var(--danger);">41 元/块</span></div>
+            </div>
+            <div class="source-note">
+                📖 成分含量数据来源：学术文献及行业实测（IEA PVPS Task12、Choi & Lee 2023等）<br>
+                银含量精确计算方式：组件功率(W) × 单瓦银耗(mg/W) ÷ 1000 = 银含量(g)
+            </div>
+        </div>
+
+        <div class="card compare-card">
+            <div class="card-title">📋 不同组件类型价值对比</div>
+            <table class="analysis-table" id="compareTable">
+                <thead>
+                    <tr>
+                        <th>组件类型</th>
+                        <th>银含量(g)</th>
+                        <th>银价值</th>
+                        <th>铝价值</th>
+                        <th>硅价值</th>
+                        <th>铜价值</th>
+                        <th>总回收值</th>
+                        <th>净回收值</th>
+                        <th>元/W</th>
+                    </tr>
+                </thead>
+                <tbody id="compareBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 批量测算 -->
+    <div class="batch-section">
+        <div class="card-title">📦 批量回收报价测算</div>
+        <div class="batch-input">
+            <span>组件数量:</span>
+            <input type="number" id="batchCount" value="1000" min="1" onchange="calcBatch()">
+            <span>块</span>
+            <span style="margin-left: 20px;">组件总重量约:</span>
+            <span id="batchWeight" style="font-weight:600; color:var(--primary);">20,000 kg</span>
+            <span style="margin-left: 20px;" class="batch-result">总净回收价值: <span id="batchTotalValue">--</span> 元</span>
+        </div>
+    </div>
+
+    <!-- 价格历史 -->
+    <div class="history-section card">
+        <div class="card-title">📈 价格变化记录 <span class="tag">每1小时更新</span></div>
+        <table class="history-table" id="historyTable">
+            <thead>
+                <tr>
+                    <th>时间</th>
+                    <th>金(元/克)</th>
+                    <th>银(元/克)</th>
+                    <th>铜(元/kg)</th>
+                    <th>铝(元/kg)</th>
+                    <th>锡(元/kg)</th>
+                    <th>PERC净值(元)</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+        </table>
+    </div>
+
+    <!-- 金属价格波动折线图 -->
+    <div class="card" style="margin-top:16px;">
+        <div class="card-title">📊 金属价格波动折线图 <span class="tag">每小时节点 · SMM期货数据</span></div>
+        <div style="position:relative;height:400px;">
+            <canvas id="priceChart"></canvas>
+        </div>
+        <div class="source-note" style="margin-top:8px;">
+            数据来源: 上海有色网(SMM) quotecenter API — 沪金(au)/沪银(ag)/沪铜(cu)/沪铝(al)/沪锡(sn) 主力合约分时数据<br>
+            回收折扣: 金银×0.95 | 铜×0.80 | 铝×0.75 | 锡×0.85 | 更新频率: 每1小时
+        </div>
+    </div>
+
+    <div class="update-time">
+        下次自动更新: <span class="countdown" id="nextUpdate">60:00</span> |
+        数据源: 上海有色网(SMM)期货API |
+        金/银/铜/铝/锡 五金属联动 |
+        <span id="lastUpdateTime">--</span>
+    </div>
+</div>
+
+<div class="footer">
+    报废光伏组件回收价值测算系统 v1.0 | 数据仅供参考，实际报价需考虑地区运费、品相、拆解难度等因素
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// ============================================================
+// 光伏组件成分含量模型（与Python模型对应）
+// ============================================================
+
+const COMPOSITION = {
+    mono_perc: {
+        label: "单晶硅PERC组件",
+        components: [
+            { key: "glass",        name: "钢化玻璃",     mass_pct: 70.0,  content_g: 14000, recovery_rate: 0.95 },
+            { key: "aluminum",     name: "铝边框",       mass_pct: 10.0,  content_g: 2000,  recovery_rate: 0.98 },
+            { key: "silicon",      name: "硅片(电池片)", mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.85 },
+            { key: "silver",       name: "银(导电银浆)", mass_pct: 0.036, content_g: 7.2,   recovery_rate: 0.90 },
+            { key: "copper",       name: "铜(焊带+接线盒)", mass_pct: 1.25, content_g: 250, recovery_rate: 0.95 },
+            { key: "eva",          name: "EVA封装胶膜",  mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.0 },
+            { key: "backsheet",    name: "背板(TPT/PET)", mass_pct: 2.5,  content_g: 500,   recovery_rate: 0.0 },
+            { key: "junction_box", name: "接线盒(塑料)",  mass_pct: 1.0,  content_g: 200,   recovery_rate: 0.0 },
+        ],
+        silver_per_watt_mg: 7.5,
+        silver_per_cell_mg: 120,
+    },
+    mono: {
+        label: "单晶硅组件(常规)",
+        components: [
+            { key: "glass",        name: "钢化玻璃",     mass_pct: 70.0,  content_g: 14000, recovery_rate: 0.95 },
+            { key: "aluminum",     name: "铝边框",       mass_pct: 10.0,  content_g: 2000,  recovery_rate: 0.98 },
+            { key: "silicon",      name: "硅片(电池片)", mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.85 },
+            { key: "silver",       name: "银(导电银浆)", mass_pct: 0.03,  content_g: 6.0,   recovery_rate: 0.90 },
+            { key: "copper",       name: "铜(焊带+接线盒)", mass_pct: 1.25, content_g: 250, recovery_rate: 0.95 },
+            { key: "eva",          name: "EVA封装胶膜",  mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.0 },
+            { key: "backsheet",    name: "背板(TPT/PET)", mass_pct: 2.5,  content_g: 500,   recovery_rate: 0.0 },
+            { key: "junction_box", name: "接线盒(塑料)",  mass_pct: 1.0,  content_g: 200,   recovery_rate: 0.0 },
+        ],
+        silver_per_watt_mg: 6.5,
+        silver_per_cell_mg: 100,
+    },
+    poly: {
+        label: "多晶硅组件",
+        components: [
+            { key: "glass",        name: "钢化玻璃",     mass_pct: 70.0,  content_g: 14000, recovery_rate: 0.95 },
+            { key: "aluminum",     name: "铝边框",       mass_pct: 10.0,  content_g: 2000,  recovery_rate: 0.98 },
+            { key: "silicon",      name: "硅片(电池片)", mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.85 },
+            { key: "silver",       name: "银(导电银浆)", mass_pct: 0.03,  content_g: 4.8,   recovery_rate: 0.90 },
+            { key: "copper",       name: "铜(焊带+接线盒)", mass_pct: 1.25, content_g: 250, recovery_rate: 0.95 },
+            { key: "eva",          name: "EVA封装胶膜",  mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.0 },
+            { key: "backsheet",    name: "背板(TPT/PET)", mass_pct: 2.5,  content_g: 500,   recovery_rate: 0.0 },
+            { key: "junction_box", name: "接线盒(塑料)",  mass_pct: 1.0,  content_g: 200,   recovery_rate: 0.0 },
+        ],
+        silver_per_watt_mg: 5.5,
+        silver_per_cell_mg: 80,
+    },
+    thin_film: {
+        label: "薄膜组件(CdTe)",
+        components: [
+            { key: "glass",        name: "钢化玻璃",     mass_pct: 80.0,  content_g: 16000, recovery_rate: 0.95 },
+            { key: "aluminum",     name: "铝边框",       mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.98 },
+            { key: "tellurium",    name: "碲(CdTe组件)", mass_pct: 0.05,  content_g: 10,    recovery_rate: 0.85 },
+            { key: "copper",       name: "铜(CIGS焊带)", mass_pct: 0.5,   content_g: 100,   recovery_rate: 0.95 },
+            { key: "eva",          name: "EVA封装胶膜",  mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.0 },
+            { key: "backsheet",    name: "背板",         mass_pct: 5.0,   content_g: 1000,  recovery_rate: 0.0 },
+            { key: "junction_box", name: "接线盒",       mass_pct: 2.5,   content_g: 500,   recovery_rate: 0.0 },
+        ],
+        silver_per_watt_mg: 0,
+        silver_per_cell_mg: 0,
+    },
+};
+
+const PANEL = { weight_kg: 20, power_w: 540, cell_count: 60 };
+const COST = 41;
+
+// 当前实时价格（从Python后端获取或用默认值）
+let PRICES = {
+    gold_per_gram: 858.0,       // 元/克 SMM黄金回收价
+    gold_diff_rate: 0,
+    silver_per_gram: 14.0,      // 元/克 SMM白银回收价
+    silver_diff_rate: 0,
+    copper_per_kg: 80.0,        // 元/kg SMM铜回收价
+    copper_diff_rate: 0,
+    aluminum_per_kg: 17.0,      // 元/kg SMM铝回收价
+    aluminum_diff_rate: 0,
+    tin_per_kg: 340.0,          // 元/kg SMM锡回收价
+    tin_diff_rate: 0,
+    silicon_per_kg: 90,         // 元/kg
+    glass_per_kg: 0.50,         // 元/kg
+    tellurium_per_g: 350,       // 元/克
+};
+
+let currentType = 'mono_perc';
+let priceHistory = [];
+let countdownSeconds = 3600;  // 1小时
+let priceChart = null;        // Chart.js实例
+
+// ============================================================
+// 价格获取（从本地Python后端JSON文件读取）
+// ============================================================
+
+async function fetchPrices() {
+    try {
+        // 从Python后端生成的JSON文件获取最新价格
+        const resp = await fetch('current_report.json');
+        if (resp.ok) {
+            const data = await resp.json();
+            const pd = data.price_data || {};
+
+            // 更新金价
+            if (pd.gold) {
+                PRICES.gold_per_gram = pd.gold.scrap_price || pd.gold.buyback_price || 858.0;
+                PRICES.gold_diff_rate = pd.gold.diff_rate || 0;
+                document.getElementById('goldSource').textContent = pd.gold.source || 'SMM';
+                document.getElementById('goldNote').textContent = pd.gold.note || '';
+            }
+            // 更新银价
+            if (pd.silver) {
+                PRICES.silver_per_gram = pd.silver.scrap_price || pd.silver.buyback_price || 14.0;
+                PRICES.silver_diff_rate = pd.silver.diff_rate || 0;
+                document.getElementById('silverSource').textContent = pd.silver.source || 'SMM';
+                document.getElementById('silverNote').textContent = pd.silver.note || '';
+            }
+            // 更新铜价
+            if (pd.copper) {
+                PRICES.copper_per_kg = pd.copper.scrap_price || pd.copper.price_per_kg || 80.0;
+                PRICES.copper_diff_rate = pd.copper.diff_rate || 0;
+                document.getElementById('copperSource').textContent = pd.copper.source || 'SMM';
+                document.getElementById('copperNote').textContent = pd.copper.note || '';
+            }
+            // 更新铝价
+            if (pd.aluminum) {
+                PRICES.aluminum_per_kg = pd.aluminum.scrap_price || pd.aluminum.price_per_kg || 17.0;
+                PRICES.aluminum_diff_rate = pd.aluminum.diff_rate || 0;
+                document.getElementById('aluminumSource').textContent = pd.aluminum.source || 'SMM';
+                document.getElementById('aluminumNote').textContent = pd.aluminum.note || '';
+            }
+            // 更新锡价
+            if (pd.tin) {
+                PRICES.tin_per_kg = pd.tin.scrap_price || pd.tin.price_per_kg || 340.0;
+                PRICES.tin_diff_rate = pd.tin.diff_rate || 0;
+                document.getElementById('tinSource').textContent = pd.tin.source || 'SMM';
+                document.getElementById('tinNote').textContent = pd.tin.note || '';
+            }
+
+            document.getElementById('lastUpdateTime').textContent =
+                `最后更新: ${data.generated_at || '--'}`;
+            document.getElementById('updateStatus').textContent =
+                `银${PRICES.silver_per_gram}元/克 | 铝${PRICES.aluminum_per_kg}元/kg`;
+        }
+    } catch (e) {
+        console.warn('价格获取失败，使用缓存值:', e);
+    }
+
+    // 加载历史记录
+    try {
+        const histResp = await fetch('price_history.json');
+        if (histResp.ok) {
+            priceHistory = await histResp.json();
+        }
+    } catch (e) {
+        console.warn('历史记录加载失败:', e);
+    }
+
+    renderAll();
+    renderChart();
+}
+
+// ============================================================
+// 价值计算引擎（前端版本，与Python模型逻辑一致）
+// ============================================================
+
+function calculateValue(type) {
+    const model = COMPOSITION[type];
+    const comps = model.components;
+
+    // 动态银含量
+    const power_w = PANEL.power_w;
+    const silver_g = power_w * model.silver_per_watt_mg / 1000;
+
+    let results = [];
+    let totalRecoverable = 0;
+
+    for (const comp of comps) {
+        let content_g = comp.content_g;
+        if (comp.key === 'silver' && silver_g > 0) content_g = silver_g;
+
+        const recoverable_g = content_g * comp.recovery_rate;
+        let unitPrice, priceUnit, value;
+
+        switch (comp.key) {
+            case 'silver':
+                unitPrice = PRICES.silver_per_gram;
+                priceUnit = '元/克';
+                value = recoverable_g * unitPrice;
+                break;
+            case 'aluminum':
+                unitPrice = PRICES.aluminum_per_kg;
+                priceUnit = '元/kg';
+                value = (recoverable_g / 1000) * unitPrice;
+                break;
+            case 'copper':
+                unitPrice = PRICES.copper_per_kg;
+                priceUnit = '元/kg';
+                value = (recoverable_g / 1000) * unitPrice;
+                break;
+            case 'silicon':
+                unitPrice = PRICES.silicon_per_kg;
+                priceUnit = '元/kg';
+                value = (recoverable_g / 1000) * unitPrice;
+                break;
+            case 'glass':
+                unitPrice = PRICES.glass_per_kg;
+                priceUnit = '元/kg';
+                value = (recoverable_g / 1000) * unitPrice;
+                break;
+            case 'tellurium':
+                unitPrice = PRICES.tellurium_per_g;
+                priceUnit = '元/克';
+                value = recoverable_g * unitPrice;
+                break;
+            default:
+                unitPrice = 0;
+                priceUnit = 'N/A';
+                value = 0;
+        }
+
+        if (comp.recovery_rate === 0) value = 0;
+        totalRecoverable += value;
+
+        results.push({
+            key: comp.key,
+            name: comp.name,
+            content_g: Math.round(content_g * 100) / 100,
+            mass_pct: comp.mass_pct,
+            recovery_rate: comp.recovery_rate,
+            recoverable_g: Math.round(recoverable_g * 100) / 100,
+            unitPrice: unitPrice,
+            priceUnit: priceUnit,
+            value: Math.round(value * 100) / 100,
+        });
+    }
+
+    // 按价值排序
+    results.sort((a, b) => b.value - a.value);
+
+    const netValue = Math.round((totalRecoverable - COST) * 100) / 100;
+    const perWatt = Math.round(netValue / power_w * 10000) / 10000;
+
+    return {
+        type, label: model.label,
+        components: results,
+        totalRecoverable: Math.round(totalRecoverable * 100) / 100,
+        netValue, perWatt,
+        silver_g: Math.round(silver_g * 100) / 100,
+        silver_per_watt_mg: model.silver_per_watt_mg,
+    };
+}
+
+// ============================================================
+// 渲染函数
+// ============================================================
+
+function renderAll() {
+    const calc = calculateValue(currentType);
+
+    // 更新价格显示
+    document.getElementById('goldVal').textContent = PRICES.gold_per_gram;
+    document.getElementById('silverVal').textContent = PRICES.silver_per_gram;
+    document.getElementById('copperVal').textContent = PRICES.copper_per_kg;
+    document.getElementById('aluminumVal').textContent = PRICES.aluminum_per_kg;
+    document.getElementById('tinVal').textContent = PRICES.tin_per_kg;
+
+    // 涨跌显示
+    function setDiff(elemId, rate) {
+        const el = document.getElementById(elemId);
+        el.textContent = rate > 0 ? `↑${rate}%` : rate < 0 ? `↓${Math.abs(rate)}%` : '--';
+        el.className = `price-diff ${rate > 0 ? 'up' : rate < 0 ? 'down' : ''}`;
+    }
+    setDiff('goldDiff', PRICES.gold_diff_rate);
+    setDiff('silverDiff', PRICES.silver_diff_rate);
+    setDiff('copperDiff', PRICES.copper_diff_rate);
+    setDiff('aluminumDiff', PRICES.aluminum_diff_rate);
+    setDiff('tinDiff', PRICES.tin_diff_rate);
+
+    // 价值总览
+    document.getElementById('totalRecoverable').textContent = calc.totalRecoverable;
+    document.getElementById('netValue').textContent = calc.netValue;
+    document.getElementById('perWattValue').textContent = calc.perWatt;
+    document.getElementById('typeLabel').textContent = calc.label;
+
+    // 分析表
+    renderAnalysisTable(calc);
+    // 贡献度图
+    renderContribution(calc);
+    // 对比表
+    renderCompareTable();
+    // 银含量说明
+    renderSilverNote(calc);
+    // 批量计算
+    calcBatch();
+    // 历史
+    renderHistory();
+}
+
+function renderAnalysisTable(calc) {
+    const tbody = document.getElementById('analysisBody');
+    let html = '';
+    const totalVal = calc.totalRecoverable;
+
+    for (let i = 0; i < calc.components.length; i++) {
+        const c = calc.components[i];
+        const pct = totalVal > 0 ? Math.round(c.value / totalVal * 1000) / 10 : 0;
+        const isHighlight = c.key === 'silver' || c.key === 'aluminum';
+        const contentDisplay = c.content_g >= 1000 ?
+            `${(c.content_g / 1000).toFixed(1)} kg` :
+            `${c.content_g} g`;
+        const recoverableDisplay = c.recoverable_g >= 1000 ?
+            `${(c.recoverable_g / 1000).toFixed(2)} kg` :
+            `${c.recoverable_g} g`;
+
+        const barColor = getBarColor(c.key);
+
+        html += `<tr class="${isHighlight ? 'highlight-row' : ''}">
+            <td>${i + 1}</td>
+            <td><strong>${c.name}</strong></td>
+            <td>${contentDisplay}</td>
+            <td>${c.mass_pct}%</td>
+            <td>${c.recovery_rate > 0 ? (c.recovery_rate * 100) + '%' : '不可回收'}</td>
+            <td>${c.recovery_rate > 0 ? recoverableDisplay : '--'}</td>
+            <td>${c.priceUnit !== 'N/A' ? c.unitPrice + ' ' + c.priceUnit : '--'}</td>
+            <td style="font-weight:700; color:${c.value > 0 ? '#1a73e8' : '#999'}">${c.value > 0 ? c.value + '元' : '--'}</td>
+            <td>
+                <div class="pct-bar">
+                    <span>${pct}%</span>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width:${pct}%; background:${barColor}"></div>
+                    </div>
+                </div>
+            </td>
+        </tr>`;
+    }
+    tbody.innerHTML = html;
+}
+
+function getBarColor(key) {
+    const colors = {
+        silver: '#a0a0a0', aluminum: '#a8d5e2', silicon: '#5f6368',
+        copper: '#b87333', glass: '#c4e1f6', tellurium: '#ff9800',
+    };
+    return colors[key] || '#ddd';
+}
+
+function renderContribution(calc) {
+    const container = document.getElementById('contributionChart');
+    const total = calc.totalRecoverable;
+    const items = calc.components.filter(c => c.value > 0);
+
+    // SVG饼图
+    const cx = 100, cy = 100, r = 80;
+    let currentAngle = 0;
+    let paths = '';
+    let legends = '';
+
+    const chartColors = ['#a8d5e2', '#c0c0c0', '#b87333', '#5f6368', '#c4e1f6', '#ff9800'];
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const pct = item.value / total;
+        const angle = pct * 360;
+        const startAngle = currentAngle;
+        const endAngle = currentAngle + angle;
+
+        const x1 = cx + r * Math.cos(startAngle * Math.PI / 180 - Math.PI / 2);
+        const y1 = cy + r * Math.sin(startAngle * Math.PI / 180 - Math.PI / 2);
+        const x2 = cx + r * Math.cos(endAngle * Math.PI / 180 - Math.PI / 2);
+        const y2 = cy + r * Math.sin(endAngle * Math.PI / 180 - Math.PI / 2);
+
+        const largeArc = angle > 180 ? 1 : 0;
+
+        paths += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc},1 ${x2},${y2} Z"
+            fill="${chartColors[i]}" stroke="white" stroke-width="2"/>`;
+
+        const pctVal = Math.round(pct * 1000) / 10;
+        legends += `<div style="display:flex;align-items:center;gap:6px;margin:4px 0;font-size:12px">
+            <span style="width:12px;height:12px;background:${chartColors[i]};border-radius:2px;display:inline-block"></span>
+            <span>${item.name}: ${item.value}元 (${pctVal}%)</span>
+        </div>`;
+
+        currentAngle = endAngle;
+    }
+
+    container.innerHTML = `
+        <div style="display:flex;align-items:center;gap:20px">
+            <svg width="200" height="200" viewBox="0 0 200 200" class="pie-svg">
+                ${paths}
+                <text x="${cx}" y="${cy}" text-anchor="middle" dy="0.35em" font-size="14" font-weight="700" fill="#333">
+                    ¥${total}
+                </text>
+            </svg>
+            <div>${legends}</div>
+        </div>
+    `;
+
+    // 铝+银总占比
+    const alAgTotal = items.filter(i => i.key === 'silver' || i.key === 'aluminum')
+        .reduce((sum, i) => sum + i.value, 0);
+    const alAgPct = Math.round(alAgTotal / total * 1000) / 10;
+
+    document.getElementById('contributionNote').innerHTML =
+        `<strong>铝+银合计占比: ${alAgPct}%</strong> — 铝边框和银浆是报废光伏组件中价值最高的两个成分，合计贡献了超过${alAgPct}%的回收价值。银含量虽仅占总质量的0.03-0.04%，但因银价极高，其价值贡献不容忽视。`;
+}
+
+function renderSilverNote(calc) {
+    const model = COMPOSITION[currentType];
+    const silverComp = calc.components.find(c => c.key === 'silver');
+    document.getElementById('silverNote').innerHTML =
+        `<strong>银含量精确计算:</strong> ${PANEL.power_w}W × ${model.silver_per_watt_mg}mg/W = <strong>${calc.silver_g}g</strong> |
+        每片电池银耗: ${model.silver_per_cell_mg}mg × ${PANEL.cell_count}片 = <strong>${(model.silver_per_cell_mg * PANEL.cell_count / 1000).toFixed(2)}g</strong> |
+        SMM白银回收价: <strong>${PRICES.silver_per_gram}元/克</strong> |
+        银回收价值: <strong>${silverComp ? silverComp.value + '元' : '--'}</strong>`;
+}
+
+function renderCompareTable() {
+    const tbody = document.getElementById('compareBody');
+    let html = '';
+
+    for (const type of ['mono_perc', 'mono', 'poly', 'thin_film']) {
+        const calc = calculateValue(type);
+        const silverComp = calc.components.find(c => c.key === 'silver');
+        const alComp = calc.components.find(c => c.key === 'aluminum');
+        const siComp = calc.components.find(c => c.key === 'silicon');
+        const cuComp = calc.components.find(c => c.key === 'copper');
+        const isActive = type === currentType;
+
+        html += `<tr style="${isActive ? 'background:#e8f0fe;font-weight:700' : ''}">
+            <td>${calc.label}</td>
+            <td>${calc.silver_g}g</td>
+            <td>${silverComp ? silverComp.value + '元' : '--'}</td>
+            <td>${alComp ? alComp.value + '元' : '--'}</td>
+            <td>${siComp ? siComp.value + '元' : '--'}</td>
+            <td>${cuComp ? cuComp.value + '元' : '--'}</td>
+            <td>${calc.totalRecoverable}元</td>
+            <td>${calc.netValue}元</td>
+            <td>${calc.perWatt}元/W</td>
+        </tr>`;
+    }
+    tbody.innerHTML = html;
+}
+
+function renderHistory() {
+    const tbody = document.getElementById('historyBody');
+    let html = '';
+    // 只显示最新的20条，倒序（最新在前）
+    const recent = priceHistory.slice(-20).reverse();
+    for (const h of recent) {
+        // 新格式: gold_per_gram / silver_per_gram / copper_per_kg / aluminum_per_kg / tin_per_kg
+        // 旧格式兼容: silver_buyback / aluminum_per_kg / copper_per_kg
+        const gold = h.gold_per_gram != null ? h.gold_per_gram.toFixed(2) : '--';
+        const silver = h.silver_per_gram != null ? h.silver_per_gram.toFixed(3)
+                     : h.silver_buyback != null ? h.silver_buyback.toFixed(3) : '--';
+        const copper = h.copper_per_kg != null ? h.copper_per_kg.toFixed(2) : '--';
+        const aluminum = h.aluminum_per_kg != null ? h.aluminum_per_kg.toFixed(2) : '--';
+        const tin = h.tin_per_kg != null ? h.tin_per_kg.toFixed(2) : '--';
+        const netVal = h.mono_perc_net_value != null ? h.mono_perc_net_value.toFixed(2) : '--';
+        html += `<tr>
+            <td>${h.time || '--'}</td>
+            <td>${gold}</td>
+            <td>${silver}</td>
+            <td>${copper}</td>
+            <td>${aluminum}</td>
+            <td>${tin}</td>
+            <td style="font-weight:600;color:var(--primary)">${netVal}</td>
+        </tr>`;
+    }
+    if (priceHistory.length === 0) {
+        html = '<tr><td colspan="7">等待首次数据采集...</td></tr>';
+    }
+    tbody.innerHTML = html;
+}
+
+// ============================================================
+// 金属价格波动折线图 (Chart.js)
+// ============================================================
+
+function renderChart() {
+    const ctx = document.getElementById('priceChart');
+    if (!ctx) return;
+
+    // 筛选有新格式数据的记录 (有 gold_per_gram 等字段)
+    const validEntries = priceHistory.filter(h => h.gold_per_gram != null);
+
+    // 如果没有新格式数据，也尝试用旧格式
+    const useNewFormat = validEntries.length > 0;
+    const data = useNewFormat ? validEntries : priceHistory.filter(h => h.silver_buyback != null || h.aluminum_per_kg != null);
+
+    if (data.length === 0) {
+        ctx.parentElement.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">暂无足够数据生成折线图，等待数据采集...</div>';
+        return;
+    }
+
+    // 准备标签和数据
+    const labels = data.map(h => {
+        const t = h.time || '';
+        // 只显示 时:分
+        const parts = t.split(' ');
+        return parts.length > 1 ? parts[1].substring(0, 5) : t;
+    });
+
+    // 提取各金属价格
+    const goldData = data.map(h => h.gold_per_gram != null ? h.gold_per_gram : null);
+    const silverData = data.map(h => {
+        if (h.silver_per_gram != null) return h.silver_per_gram;
+        if (h.silver_buyback != null) return h.silver_buyback;
+        return null;
+    });
+    const copperData = data.map(h => h.copper_per_kg != null ? h.copper_per_kg : null);
+    const aluminumData = data.map(h => h.aluminum_per_kg != null ? h.aluminum_per_kg : null);
+    const tinData = data.map(h => h.tin_per_kg != null ? h.tin_per_kg : null);
+
+    // 各金属实际价格范围差异极大 (金858 vs 铝17)
+    // 使用归一化(indexed)方式: 以第一条数据为基准100，显示相对变化
+    function normalize(arr) {
+        const first = arr.find(v => v != null);
+        if (first == null) return arr;
+        return arr.map(v => v != null ? Math.round(v / first * 1000) / 10 : null);
+    }
+
+    const datasets = [
+        {
+            label: '黄金 (元/克)',
+            data: useNewFormat ? normalize(goldData) : goldData.map(() => null),
+            borderColor: '#FFD700',
+            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+            borderWidth: 2,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            fill: false,
+            yAxisID: 'y',
+        },
+        {
+            label: '白银 (元/克)',
+            data: normalize(silverData),
+            borderColor: '#a0a0a0',
+            backgroundColor: 'rgba(160, 160, 160, 0.1)',
+            borderWidth: 2,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            fill: false,
+            yAxisID: 'y',
+        },
+        {
+            label: '铜 (元/kg)',
+            data: normalize(copperData),
+            borderColor: '#b87333',
+            backgroundColor: 'rgba(184, 115, 51, 0.1)',
+            borderWidth: 2,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            fill: false,
+            yAxisID: 'y',
+        },
+        {
+            label: '铝 (元/kg)',
+            data: normalize(aluminumData),
+            borderColor: '#5b9bd5',
+            backgroundColor: 'rgba(91, 155, 213, 0.1)',
+            borderWidth: 2,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            fill: false,
+            yAxisID: 'y',
+        },
+        {
+            label: '锡 (元/kg)',
+            data: useNewFormat ? normalize(tinData) : tinData.map(() => null),
+            borderColor: '#7d7d7d',
+            backgroundColor: 'rgba(125, 125, 125, 0.1)',
+            borderWidth: 2,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            fill: false,
+            yAxisID: 'y',
+        },
+    ];
+
+    // 存储实际价格用于tooltip
+    const actualPrices = {
+        gold: goldData,
+        silver: silverData,
+        copper: copperData,
+        aluminum: aluminumData,
+        tin: tinData,
+    };
+
+    // 如果已有图表实例，先销毁
+    if (priceChart) {
+        priceChart.destroy();
+    }
+
+    priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets,
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: useNewFormat ? '五金属回收价相对变化 (基准=100)' : '金属回收价相对变化 (基准=100)',
+                    font: { size: 14, weight: 'bold' },
+                    color: '#333',
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { font: { size: 12 }, usePointStyle: true },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const idx = context.dataIndex;
+                            const dsLabel = context.dataset.label;
+                            const normalized = context.parsed.y;
+                            // 找到对应金属的实际价格
+                            let metalKey = '';
+                            if (dsLabel.includes('金') && !dsLabel.includes('白')) metalKey = 'gold';
+                            else if (dsLabel.includes('白银')) metalKey = 'silver';
+                            else if (dsLabel.includes('铜')) metalKey = 'copper';
+                            else if (dsLabel.includes('铝')) metalKey = 'aluminum';
+                            else if (dsLabel.includes('锡')) metalKey = 'tin';
+
+                            const actual = actualPrices[metalKey] ? actualPrices[metalKey][idx] : null;
+                            if (actual != null) {
+                                return `${dsLabel}: ${actual.toFixed(2)} (指数: ${normalized})`;
+                            }
+                            return `${dsLabel}: 指数 ${normalized}`;
+                        }
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: '时间 (每小时节点)',
+                        font: { size: 12 },
+                    },
+                    grid: { display: false },
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: '相对价格指数 (基准=100)',
+                        font: { size: 12 },
+                    },
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    suggestedMin: 90,
+                    suggestedMax: 110,
+                },
+            },
+            animation: {
+                duration: 800,
+                easing: 'easeInOutQuart',
+            },
+        },
+    });
+}
+
+function calcBatch() {
+    const count = parseInt(document.getElementById('batchCount').value) || 1;
+    const calc = calculateValue(currentType);
+    document.getElementById('batchWeight').textContent = (PANEL.weight_kg * count).toLocaleString() + ' kg';
+    document.getElementById('batchTotalValue').textContent = (calc.netValue * count).toLocaleString();
+}
+
+function switchType(type) {
+    currentType = type;
+    document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.type === type);
+    });
+    renderAll();
+}
+
+// ============================================================
+// 自动更新倒计时
+// ============================================================
+
+function startCountdown() {
+    countdownSeconds = 3600;
+    setInterval(() => {
+        countdownSeconds--;
+        if (countdownSeconds <= 0) {
+            countdownSeconds = 3600;
+            fetchPrices();
+        }
+        const mins = Math.floor(countdownSeconds / 60);
+        const secs = countdownSeconds % 60;
+        document.getElementById('nextUpdate').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 首次加载：用默认价格渲染，然后尝试获取实时价格
+    renderAll();
+    fetchPrices();
+    startCountdown();
+
+    // 每1小时自动从JSON文件刷新价格
+    setInterval(fetchPrices, 3600000);
+});
+</script>
+
+</body>
+</html>
