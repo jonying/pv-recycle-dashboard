@@ -1,7 +1,7 @@
 {
   "report_title": "报废光伏组件回收价值测算分析报告",
-  "generated_at": "2026-08-08 20:13:26",
-  "price_update_at": "2026-08-08 20:13:26",
+  "generated_at": "2026-08-08 21:15:44",
+  "price_update_at": "2026-08-08 21:15:44",
   "price_data": {
     "gold": {
       "metal": "gold",
@@ -150,7 +150,7 @@
         "cell_type": "mono_perc"
       },
       "model_type": "单晶硅PERC组件",
-      "update_time": "2026-08-08 20:13:26",
+      "update_time": "2026-08-08 21:15:44",
       "price_sources": {
         "silicon": "行业参考",
         "silver": "上海有色网(SMM)期货",
@@ -310,7 +310,7 @@
         "cell_type": "mono"
       },
       "model_type": "单晶硅组件(常规)",
-      "update_time": "2026-08-08 20:13:26",
+      "update_time": "2026-08-08 21:15:44",
       "price_sources": {
         "silicon": "行业参考",
         "silver": "上海有色网(SMM)期货",
@@ -470,7 +470,7 @@
         "cell_type": "poly"
       },
       "model_type": "多晶硅组件",
-      "update_time": "2026-08-08 20:13:26",
+      "update_time": "2026-08-08 21:15:44",
       "price_sources": {
         "silicon": "行业参考",
         "silver": "上海有色网(SMM)期货",
