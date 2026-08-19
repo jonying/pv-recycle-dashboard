@@ -8304,5 +8304,26 @@
     "mono_perc_net_value": 150.81,
     "mono_net_value": 143.63,
     "poly_net_value": 136.45
+  },
+  {
+    "time": "2026-08-19 06:19:31",
+    "gold_per_gram": 897.199,
+    "silver_per_gram": 14.613,
+    "copper_per_kg": 85.552,
+    "aluminum_per_kg": 17.737,
+    "tin_per_kg": 356.787,
+    "gold_futures": 944.42,
+    "silver_futures": 15382,
+    "copper_futures": 106940,
+    "aluminum_futures": 23650,
+    "tin_futures": 419750,
+    "gold_diff_rate": -1.38,
+    "silver_diff_rate": -4.43,
+    "copper_diff_rate": -0.96,
+    "aluminum_diff_rate": -1.17,
+    "tin_diff_rate": -1.3,
+    "mono_perc_net_value": 150.57,
+    "mono_net_value": 143.41,
+    "poly_net_value": 136.25
   }
 ]
