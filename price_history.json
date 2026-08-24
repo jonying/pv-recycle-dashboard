@@ -1,16 +1,5 @@
 [
   {
-    "time": "2026-07-07 14:22:41",
-    "silver_buyback": 14.618,
-    "silver_sell": 15.695,
-    "silver_diff_rate": 0.66,
-    "aluminum_per_kg": 18.04,
-    "copper_per_kg": 65.0,
-    "mono_perc_net_value": 146.31,
-    "mono_net_value": 139.14,
-    "poly_net_value": 131.98
-  },
-  {
     "time": "2026-07-07 14:27:47",
     "silver_buyback": 14.618,
     "silver_sell": 15.695,
@@ -10460,6 +10449,27 @@
   },
   {
     "time": "2026-08-24 07:46:04",
+    "gold_per_gram": 956.479,
+    "silver_per_gram": 16.001,
+    "copper_per_kg": 86.488,
+    "aluminum_per_kg": 17.824,
+    "tin_per_kg": 363.043,
+    "gold_futures": 1006.82,
+    "silver_futures": 16843,
+    "copper_futures": 108110,
+    "aluminum_futures": 23765,
+    "tin_futures": 427110,
+    "gold_diff_rate": 2.86,
+    "silver_diff_rate": 1.4,
+    "copper_diff_rate": 0.76,
+    "aluminum_diff_rate": 0.61,
+    "tin_diff_rate": -0.14,
+    "mono_perc_net_value": 156.03,
+    "mono_net_value": 148.19,
+    "poly_net_value": 140.35
+  },
+  {
+    "time": "2026-08-24 08:31:53",
     "gold_per_gram": 956.479,
     "silver_per_gram": 16.001,
     "copper_per_kg": 86.488,
