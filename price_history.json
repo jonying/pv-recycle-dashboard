@@ -1,26 +1,5 @@
 [
   {
-    "time": "2026-08-13 22:27:22",
-    "gold_per_gram": 900.125,
-    "silver_per_gram": 15.015,
-    "copper_per_kg": 86.232,
-    "aluminum_per_kg": 18.008,
-    "tin_per_kg": 363.366,
-    "gold_futures": 947.5,
-    "silver_futures": 15805,
-    "copper_futures": 107790,
-    "aluminum_futures": 24010,
-    "tin_futures": 427490,
-    "gold_diff_rate": -1.24,
-    "silver_diff_rate": -1.48,
-    "copper_diff_rate": -0.03,
-    "aluminum_diff_rate": -0.62,
-    "tin_diff_rate": 0.07,
-    "mono_perc_net_value": 152.73,
-    "mono_net_value": 145.38,
-    "poly_net_value": 138.02
-  },
-  {
     "time": "2026-08-13 23:27:32",
     "gold_per_gram": 900.125,
     "silver_per_gram": 15.015,
@@ -10498,5 +10477,26 @@
     "mono_perc_net_value": 149.96,
     "mono_net_value": 142.99,
     "poly_net_value": 136.03
+  },
+  {
+    "time": "2026-09-30 06:03:09",
+    "gold_per_gram": 861.441,
+    "silver_per_gram": 14.174,
+    "copper_per_kg": 87.64,
+    "aluminum_per_kg": 17.899,
+    "tin_per_kg": 348.007,
+    "gold_futures": 906.78,
+    "silver_futures": 14920,
+    "copper_futures": 109550,
+    "aluminum_futures": 23865,
+    "tin_futures": 409420,
+    "gold_diff_rate": 0.99,
+    "silver_diff_rate": 0.09,
+    "copper_diff_rate": 0.23,
+    "aluminum_diff_rate": -0.65,
+    "tin_diff_rate": 0.11,
+    "mono_perc_net_value": 149.78,
+    "mono_net_value": 142.83,
+    "poly_net_value": 135.88
   }
 ]
