@@ -1,54 +1,54 @@
 {
   "report_title": "报废光伏组件回收价值测算分析报告",
-  "generated_at": "2026-10-23 17:58:26",
-  "price_update_at": "2026-10-23 17:58:26",
+  "generated_at": "2026-10-23 20:54:08",
+  "price_update_at": "2026-10-23 20:54:08",
   "price_data": {
     "gold": {
       "metal": "gold",
       "label": "黄金",
       "instrument_id": "au2612",
-      "futures_price": 861.26,
+      "futures_price": 861.62,
       "futures_unit": "元/克",
-      "converted_price": 861.26,
+      "converted_price": 861.62,
       "scrap_discount": 0.95,
-      "scrap_price": 818.197,
+      "scrap_price": 818.539,
       "target_unit": "元/克",
       "high": 868.86,
       "low": 856.4,
       "pre_settlement": 869.2,
-      "diff": -7.94,
-      "diff_rate": -0.91,
-      "update_time": "2026-10-24 01:58:00",
+      "diff": -7.58,
+      "diff_rate": -0.87,
+      "update_time": "2026-10-24 02:30:00",
       "trading_day": "2026-10-26",
       "source": "上海有色网(SMM)期货",
-      "note": "SMM黄金期货861.26元/克 × 折扣0.95 = 回收价818.197元/克",
-      "buyback_price": 818.197,
-      "sell_price": 878.49,
-      "exchange_close": 861.26,
+      "note": "SMM黄金期货861.62元/克 × 折扣0.95 = 回收价818.539元/克",
+      "buyback_price": 818.539,
+      "sell_price": 878.85,
+      "exchange_close": 861.62,
       "unit": "元/克"
     },
     "silver": {
       "metal": "silver",
       "label": "白银",
       "instrument_id": "ag2612",
-      "futures_price": 13108,
+      "futures_price": 13116,
       "futures_unit": "元/kg",
-      "converted_price": 13.108,
+      "converted_price": 13.116,
       "scrap_discount": 0.95,
-      "scrap_price": 12.453,
+      "scrap_price": 12.46,
       "target_unit": "元/克",
       "high": 13155,
       "low": 12826,
       "pre_settlement": 13255,
-      "diff": -147,
-      "diff_rate": -1.11,
-      "update_time": "2026-10-24 01:58:00",
+      "diff": -139,
+      "diff_rate": -1.05,
+      "update_time": "2026-10-24 02:30:00",
       "trading_day": "2026-10-26",
       "source": "上海有色网(SMM)期货",
-      "note": "SMM白银期货13108元/kg × 折扣0.95 = 回收价12.453元/克",
-      "buyback_price": 12.453,
-      "sell_price": 13.37,
-      "exchange_close": 13108,
+      "note": "SMM白银期货13116元/kg × 折扣0.95 = 回收价12.46元/克",
+      "buyback_price": 12.46,
+      "sell_price": 13.378,
+      "exchange_close": 13116,
       "unit": "元/克"
     },
     "copper": {
@@ -150,7 +150,7 @@
         "cell_type": "mono_perc"
       },
       "model_type": "单晶硅PERC组件",
-      "update_time": "2026-10-23 17:58:26",
+      "update_time": "2026-10-23 20:54:08",
       "price_sources": {
         "silicon": "行业参考",
         "silver": "上海有色网(SMM)期货",
@@ -182,10 +182,10 @@
           "mass_pct": 0.036,
           "recovery_rate": 0.9,
           "recoverable_g": 3.65,
-          "unit_price": 12.453,
+          "unit_price": 12.46,
           "price_unit_label": "元/克(SMM银回收价)",
           "price_source": "上海有色网(SMM)期货",
-          "value_yuan": 45.45,
+          "value_yuan": 45.48,
           "value_rank": 2
         },
         {
@@ -267,11 +267,11 @@
           "value_rank": 8
         }
       ],
-      "total_raw_value": 204.47,
-      "total_recoverable_value": 183.84,
+      "total_raw_value": 204.5,
+      "total_recoverable_value": 183.87,
       "processing_cost": 41,
-      "net_recycle_value": 142.84,
-      "recycle_quote_per_watt": 0.2645,
+      "net_recycle_value": 142.87,
+      "recycle_quote_per_watt": 0.2646,
       "value_contribution": {
         "silicon": {
           "value": 76.5,
@@ -279,7 +279,7 @@
           "name": "硅片(电池片)"
         },
         "silver": {
-          "value": 45.45,
+          "value": 45.48,
           "pct_of_total": 24.7,
           "name": "银(导电银浆)"
         },
@@ -310,7 +310,7 @@
         "cell_type": "mono"
       },
       "model_type": "单晶硅组件(常规)",
-      "update_time": "2026-10-23 17:58:26",
+      "update_time": "2026-10-23 20:54:08",
       "price_sources": {
         "silicon": "行业参考",
         "silver": "上海有色网(SMM)期货",
@@ -342,10 +342,10 @@
           "mass_pct": 0.036,
           "recovery_rate": 0.9,
           "recoverable_g": 3.16,
-          "unit_price": 12.453,
+          "unit_price": 12.46,
           "price_unit_label": "元/克(SMM银回收价)",
           "price_source": "上海有色网(SMM)期货",
-          "value_yuan": 39.35,
+          "value_yuan": 39.37,
           "value_rank": 2
         },
         {
@@ -427,11 +427,11 @@
           "value_rank": 8
         }
       ],
-      "total_raw_value": 197.75,
-      "total_recoverable_value": 177.74,
+      "total_raw_value": 197.77,
+      "total_recoverable_value": 177.76,
       "processing_cost": 41,
-      "net_recycle_value": 136.74,
-      "recycle_quote_per_watt": 0.2532,
+      "net_recycle_value": 136.76,
+      "recycle_quote_per_watt": 0.2533,
       "value_contribution": {
         "silicon": {
           "value": 76.5,
@@ -439,7 +439,7 @@
           "name": "硅片(电池片)"
         },
         "silver": {
-          "value": 39.35,
+          "value": 39.37,
           "pct_of_total": 22.1,
           "name": "银(导电银浆)"
         },
@@ -470,7 +470,7 @@
         "cell_type": "poly"
       },
       "model_type": "多晶硅组件",
-      "update_time": "2026-10-23 17:58:26",
+      "update_time": "2026-10-23 20:54:08",
       "price_sources": {
         "silicon": "行业参考",
         "aluminum": "上海有色网(SMM)期货",
@@ -515,10 +515,10 @@
           "mass_pct": 0.03,
           "recovery_rate": 0.9,
           "recoverable_g": 2.67,
-          "unit_price": 12.453,
+          "unit_price": 12.46,
           "price_unit_label": "元/克(SMM银回收价)",
           "price_source": "上海有色网(SMM)期货",
-          "value_yuan": 33.25,
+          "value_yuan": 33.27,
           "value_rank": 3
         },
         {
@@ -587,11 +587,11 @@
           "value_rank": 8
         }
       ],
-      "total_raw_value": 191.02,
-      "total_recoverable_value": 171.64,
+      "total_raw_value": 191.04,
+      "total_recoverable_value": 171.66,
       "processing_cost": 41,
-      "net_recycle_value": 130.64,
-      "recycle_quote_per_watt": 0.2419,
+      "net_recycle_value": 130.66,
+      "recycle_quote_per_watt": 0.242,
       "value_contribution": {
         "silicon": {
           "value": 76.5,
@@ -604,7 +604,7 @@
           "name": "铝边框"
         },
         "silver": {
-          "value": 33.25,
+          "value": 33.27,
           "pct_of_total": 19.4,
           "name": "银(导电银浆)"
         },
